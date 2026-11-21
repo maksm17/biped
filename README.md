@@ -35,8 +35,7 @@ joint targets = sine_gait(φ, command) + 0.15 rad × policy(observation)        
 - `st3215_hardware` is the `ros2_control` driver: one sync read and one sync write per cycle on each leg's bus.
 - Both controllers go limp on a fall (tilt > 40°) or an e-stop: the servo targets follow the measured pose.
 
-The biggest lesson was that the feet mattered more than the controller. The original CAD feet have a domed
-bottom, and nothing (tuning or RL) could keep the robot up on them. With flat feet it walks.
+
 
 ## Layout
 
