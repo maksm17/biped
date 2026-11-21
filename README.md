@@ -27,16 +27,7 @@ joint targets = sine_gait(φ, command) + 0.15 rad × policy(observation)        
 
 ### Control flow on the robot
 
-```
-                 ┌──────────────── Raspberry Pi 5 (Docker, ROS 2 Jazzy) ────────────────┐
- /cmd_vel ──────►│  rl_policy_node (PPO, numpy) ──┐                                     │
-                 │              or                │ position_controller/commands        │
- /goal_polar ───►│  nav_fsm ──leg_gains──►        ├──────────► ros2_control ────────────┼─► UART ─► 2× bus servo
- /camera/goal ──►│            gait_node (sines) ──┘            (st3215_hardware)        │          adapter ─► 6× ST3215
-                 │                                                                      │
-                 │      imu/data ◄── madgwick ◄── mpu6050_node ◄── I2C ◄────────────────┼── MPU6050
-                 └──────────────────────────────────────────────────────────────────────┘
-```
+<img src="docs/control.svg" alt="Control flow: inputs, controllers on the Raspberry Pi, servos and IMU" width="100%">
 
 - `rl_policy_node` reads `joint_states`, `imu/data` and `/cmd_vel` and publishes joint targets at 50 Hz.
 - `gait_node` is the plain sine-gait baseline on the same topics. `nav_fsm` (polar goals, camera gestures)

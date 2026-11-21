@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 450" width="1000" height="450" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <style>
+    .pi    { fill: #f6f8fa; stroke: #d0d7de; }
+    .group { fill: none; stroke: #8c959f; stroke-dasharray: 5 4; }
+    .box   { fill: #ffffff; stroke: #8c959f; }
+    .rl    { fill: #ddf4ff; stroke: #0969da; stroke-width: 2; }
+    .hw    { fill: #fff8c5; stroke: #bf8700; }
+    .io    { fill: #ffffff; stroke: #8c959f; }
+    .t     { fill: #1f2328; font-size: 14px; font-weight: 600; }
+    .s     { fill: #59636e; font-size: 11.5px; }
+    .lbl   { fill: #59636e; font-size: 11px; }
+    .hdr   { fill: #59636e; font-size: 12px; font-weight: 600; letter-spacing: .3px; }
+    .mono  { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .cmd   { stroke: #1f2328; stroke-width: 1.6; fill: none; }
+    .fb    { stroke: #0969da; stroke-width: 1.4; fill: none; stroke-dasharray: 5 4; }
+    .ah    { fill: #1f2328; }
+    .ahb   { fill: #0969da; }
+    @media (prefers-color-scheme: dark) {
+      .pi    { fill: #161b22; stroke: #3d444d; }
+      .group { stroke: #656c76; }
+      .box, .io { fill: #0d1117; stroke: #656c76; }
+      .rl    { fill: #0c2d6b; stroke: #4493f8; }
+      .hw    { fill: #2e2407; stroke: #d29922; }
+      .t     { fill: #f0f6fc; }
+      .s, .lbl, .hdr { fill: #9198a1; }
+      .cmd   { stroke: #f0f6fc; }
+      .fb    { stroke: #4493f8; }
+      .ah    { fill: #f0f6fc; }
+      .ahb   { fill: #4493f8; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="ah" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="ahb" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+  </defs>
+
+  <!-- Raspberry Pi container -->
+  <rect class="pi" x="165" y="14" width="600" height="404" rx="12"/>
+  <text class="hdr" x="185" y="38">RASPBERRY PI 5 · DOCKER · ROS 2 JAZZY</text>
+
+  <!-- inputs -->
+  <text class="hdr" x="20" y="38">INPUTS</text>
+  <rect class="io" x="20" y="92" width="120" height="36" rx="18"/>
+  <text class="s mono" x="80" y="114" text-anchor="middle">/cmd_vel</text>
+  <rect class="io" x="20" y="206" width="120" height="36" rx="18"/>
+  <text class="s mono" x="80" y="228" text-anchor="middle">/goal_polar</text>
+  <rect class="io" x="20" y="252" width="120" height="36" rx="18"/>
+  <text class="s mono" x="80" y="274" text-anchor="middle">/camera/goal</text>
+
+  <!-- nav_fsm -->
+  <rect class="box" x="174" y="218" width="108" height="58" rx="8"/>
+  <text class="t mono" x="228" y="243" text-anchor="middle">nav_fsm</text>
+  <text class="s" x="228" y="261" text-anchor="middle">goals, gestures</text>
+
+  <!-- controller group -->
+  <rect class="group" x="318" y="56" width="214" height="252" rx="10"/>
+  <text class="lbl" x="425" y="72" text-anchor="middle">controller (one of)</text>
+
+  <rect class="rl" x="334" y="80" width="182" height="66" rx="8"/>
+  <text class="t mono" x="425" y="106" text-anchor="middle">rl_policy_node</text>
+  <text class="s" x="425" y="125" text-anchor="middle">PPO residual policy</text>
+  <text class="s" x="425" y="139" text-anchor="middle">numpy · 50 Hz</text>
+
+  <text class="lbl" x="425" y="186" text-anchor="middle">or</text>
+
+  <rect class="box" x="334" y="216" width="182" height="62" rx="8"/>
+  <text class="t mono" x="425" y="242" text-anchor="middle">gait_node</text>
+  <text class="s" x="425" y="261" text-anchor="middle">sine gait · baseline</text>
+
+  <!-- ros2_control -->
+  <rect class="box" x="580" y="118" width="166" height="120" rx="8"/>
+  <text class="t mono" x="663" y="158" text-anchor="middle">ros2_control</text>
+  <text class="s mono" x="663" y="178" text-anchor="middle">st3215_hardware</text>
+  <text class="s" x="663" y="198" text-anchor="middle">sync read / write</text>
+  <text class="s" x="663" y="214" text-anchor="middle">per leg, each cycle</text>
+
+  <!-- sensors row -->
+  <rect class="box" x="334" y="344" width="182" height="56" rx="8"/>
+  <text class="t mono" x="425" y="368" text-anchor="middle">madgwick</text>
+  <text class="s" x="425" y="386" text-anchor="middle">orientation filter</text>
+  <rect class="box" x="580" y="344" width="166" height="56" rx="8"/>
+  <text class="t mono" x="663" y="368" text-anchor="middle">mpu6050_node</text>
+  <text class="s" x="663" y="386" text-anchor="middle">IMU driver</text>
+
+  <!-- hardware -->
+  <text class="hdr" x="805" y="38">HARDWARE</text>
+  <rect class="hw" x="805" y="104" width="175" height="54" rx="8"/>
+  <text class="t" x="892" y="127" text-anchor="middle">2× bus servo adapter</text>
+  <text class="s" x="892" y="145" text-anchor="middle">one per leg</text>
+  <rect class="hw" x="805" y="198" width="175" height="54" rx="8"/>
+  <text class="t" x="892" y="221" text-anchor="middle">6× ST3215 servos</text>
+  <text class="s" x="892" y="239" text-anchor="middle">hip roll · hip pitch · ankle</text>
+  <rect class="hw" x="805" y="344" width="175" height="56" rx="8"/>
+  <text class="t" x="892" y="368" text-anchor="middle">MPU6050</text>
+  <text class="s" x="892" y="386" text-anchor="middle">gyro + accelerometer</text>
+
+  <!-- command arrows -->
+  <path class="cmd" d="M140,110 H332" marker-end="url(#a)"/>
+  <path class="cmd" d="M140,224 H156 V238 H172" marker-end="url(#a)"/>
+  <path class="cmd" d="M140,270 H156 V256 H172" marker-end="url(#a)"/>
+  <path class="cmd" d="M282,247 H332" marker-end="url(#a)"/>
+  <text class="lbl" x="300" y="227" text-anchor="middle">leg</text>
+  <text class="lbl" x="300" y="239" text-anchor="middle">gains</text>
+
+  <path class="cmd" d="M516,113 H548 V150 H578" marker-end="url(#a)"/>
+  <path class="cmd" d="M516,247 H548 V206 H578" marker-end="url(#a)"/>
+  <text class="lbl" x="556" y="174" text-anchor="middle">joint</text>
+  <text class="lbl" x="556" y="187" text-anchor="middle">targets</text>
+
+  <path class="cmd" d="M746,140 H803" marker-end="url(#a)"/>
+  <text class="lbl" x="775" y="132" text-anchor="middle">UART</text>
+  <path class="cmd" d="M892,158 V196" marker-end="url(#a)"/>
+
+  <!-- sensor feedback -->
+  <path class="fb" d="M805,372 H748" marker-end="url(#b)"/>
+  <text class="lbl" x="777" y="364" text-anchor="middle">I2C</text>
+  <path class="fb" d="M580,372 H518" marker-end="url(#b)"/>
+  <path class="fb" d="M425,344 V310" marker-end="url(#b)"/>
+  <text class="lbl" x="433" y="331">imu/data</text>
+  <path class="fb" d="M663,238 V318 H500 V310" marker-end="url(#b)"/>
+  <text class="lbl" x="590" y="312" text-anchor="middle">joint_states</text>
+
+  <!-- legend -->
+  <path class="cmd" d="M185,438 H215" marker-end="url(#a)"/>
+  <text class="lbl" x="222" y="442">commands</text>
+  <path class="fb" d="M300,438 H330" marker-end="url(#b)"/>
+  <text class="lbl" x="337" y="442">sensor feedback</text>
+  <text class="lbl" x="440" y="442">Both controllers go limp on a fall (tilt &gt; 40°) or an e-stop.</text>
+</svg>
