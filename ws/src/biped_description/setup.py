@@ -6,7 +6,7 @@ package_name = 'biped_description'
 
 setup(
     name=package_name,
-    version='0.0.0',
+    version='0.1.0',
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages',
@@ -19,11 +19,10 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='author',
-    maintainer_email='todo@todo.com',
-    description='The ' + package_name + ' package',
-    license='TODO: License declaration',
-    tests_require=['pytest'],
+    maintainer='maks',
+    maintainer_email='maksmajdanski@gmail.com',
+    description='URDF/xacro, meshes and ros2_control config of the 6-DOF biped',
+    license='MIT',
     entry_points={
         'console_scripts': [
         ],

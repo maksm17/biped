@@ -1,0 +1,6 @@
+# RL training / evaluation (laptop): python3 -m venv .venv-rl && .venv-rl/bin/pip install -r rl/requirements.txt
+mujoco>=3.2
+gymnasium
+numpy
+torch
+stable-baselines3

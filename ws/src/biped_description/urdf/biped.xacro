@@ -3,7 +3,6 @@
 
 <xacro:include filename="$(find biped_description)/urdf/materials.xacro" />
 <xacro:include filename="$(find biped_description)/urdf/biped.ros2control" />
-<xacro:include filename="$(find biped_description)/urdf/biped.gazebo" />
 <link name="base_link">
   <inertial>
     <origin xyz="0.0005141690127301339 0.0007213265656044626 0.22078241836593335" rpy="0 0 0"/>

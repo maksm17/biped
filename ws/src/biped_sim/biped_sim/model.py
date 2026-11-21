@@ -2,6 +2,7 @@
 
 Adds: free-floating base, floor, ST3215-like position actuators, IMU sensors.
 """
+import os
 import re
 import xml.etree.ElementTree as ET
 
@@ -23,8 +24,10 @@ def urdf_from_xacro(xacro_path):
     for tag in ('ros2_control', 'gazebo'):
         for el in root.findall(tag):
             root.remove(el)
+    base = os.path.dirname(os.path.abspath(xacro_path))
     for mesh in root.iter('mesh'):
-        mesh.set('filename', re.sub(r'^(file|package)://', '', mesh.get('filename')))
+        path = re.sub(r'^(file|package)://', '', mesh.get('filename'))
+        mesh.set('filename', os.path.normpath(os.path.join(base, path)))  # relative -> file dir
     mj = ET.SubElement(root, 'mujoco')
     ET.SubElement(mj, 'compiler', discardvisual='false', balanceinertia='true',
                   fusestatic='false')

@@ -6,31 +6,29 @@
   any  --gait halted (fall / e-stop)--> HALTED --robot standing again--> IDLE
 
 Inputs
-  /goal_polar   geometry_msgs/Point   x = r [m], y = theta [deg, + = left]
-  camera        gesture_source 'array' (default): ONE topic (gesture_array_topic) with 5 values in
-                  gesture_order [forward, back, left, right, stop] (teammates' robot_controller.py,
-                  /camera/goal Int8MultiArray @20 Hz), exactly one 1, e.g. 0,0,0,1,0 = right. Message type auto-detected: std_msgs/(U)Int8/16/32/64MultiArray,
-                  Float32/64MultiArray or String ("0,1,0,0,0" / "01000"). All zeros = no gesture,
-                  more than one 1 or wrong length -> stop.
-                gesture_source 'topics': std_msgs/Bool on gesture_topics
-                  [forward, right, left, back, stop]; priority stop > back > forward > left > right
-                  gesture_mode 'hold': move while a gesture is true (MANUAL state), stop when none
-                               'step': each new gesture = one goal (gesture_step_m / gesture_turn_deg)
-                  back_action 'stop' (no walking backwards on these feet)
-                gesture_source 'http': teammates' Flask JSON {"command": FORWARD|BACKWARD|LEFT|
-                  RIGHT|NO_FINGERS, "obstacle_detected": bool} at camera_url
-                obstacle: topic obstacle_topic (std_msgs/Bool) or the HTTP field
-  imu/data      heading (relative yaw), gait/state (halted?)
+  /goal_polar   geometry_msgs/Point: x = r [m], y = theta [deg, + = left]
+  imu/data      heading (relative yaw); gait/state tells whether the gait halted
   nav/cancel    std_srvs/Trigger
+  gestures, selected with gesture_source:
+    'array' (default)  one topic (gesture_array_topic, e.g. /camera/goal) with 5 values
+                       [forward, back, left, right, stop], exactly one set to 1 (0,0,0,1,0 = right).
+                       Any std_msgs Int/Float MultiArray or a String "0,0,0,1,0" / "00010".
+                       All zeros = no gesture, anything else invalid = stop.
+    'topics'           one std_msgs/Bool topic per gesture (gesture_topics);
+                       priority stop > back > forward > left > right
+    'http'             JSON {"command": FORWARD|BACKWARD|LEFT|RIGHT|NO_FINGERS,
+                       "obstacle_detected": bool} polled from camera_url
+  gesture_mode 'hold' moves while a gesture is active, 'step' turns each new gesture into one goal
+  (gesture_step_m / gesture_turn_deg). 'back' stops: the feet can't walk backwards.
+  Obstacles come from obstacle_topic (std_msgs/Bool) or the HTTP field.
 Outputs
-  gait/leg_gains  [k_left, k_right, roll]  per-leg step gains for gait_node
+  gait/leg_gains  [k_left, k_right, roll] per-leg step gains for gait_node
   nav/state       std_msgs/String
 
-There is no odometry: distance = speed x time; heading from the IMU (drifts slowly, no magnetometer).
-Turning is weak on these feet (no hip yaw): in MuJoCo only the left arc gives net rotation
-(~2.5 deg/s after the stop transient, the robot partly unwinds when it stops). Hence closed loop on
-the IMU heading in chunks; turn_mode 'both' tries the mirrored right arc and falls back to turning
-left the long way ('left_only' behaviour) when right turning makes no progress.
+No odometry: distance = speed x time, heading from the IMU (drifts slowly, no magnetometer).
+Turning is weak without a hip yaw joint, so the heading loop runs in chunks: turn, stop, settle,
+re-measure. In simulation only the left arc gives a net rotation (~2.5 deg/s). turn_mode 'both'
+tries the mirrored right arc and falls back to turning left the long way if that makes no progress.
 """
 import json
 import math

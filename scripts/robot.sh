@@ -30,6 +30,7 @@ Drive the real robot from the laptop (everything runs in the 'biped' container o
 USAGE
 }
 HOST=${ROBOT_HOST:-rpi}
+REMOTE_DIR=${REMOTE_DIR:-zurich}   # same as deploy.sh
 CFG=/ws/install/biped_control/share/biped_control/config
 cd "$(dirname "$0")/.."
 
@@ -39,33 +40,34 @@ ros() {  # run commands inside the running container (sent via stdin: no nested 
 
 case "${1:-}" in
   start)
-    ssh "$HOST" "cd zurich && docker compose down >/dev/null 2>&1; \
+    ssh "$HOST" "cd $REMOTE_DIR && docker compose down >/dev/null 2>&1; \
       ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-42} LAUNCH_ARGS='gait_params:=$CFG/${2:-gait_filed10mm.yaml} ${*:3}' docker compose up -d"
     echo "Robot will stand up in ~2 s after bringup. Then: scripts/robot.sh walk | teleop" ;;
   zero)
     ros "timeout 5 ros2 service call /gait/estop std_srvs/srv/Trigger >/dev/null 2>&1; sleep 0.3
          ros2 control set_hardware_component_state BipedSystem inactive" >/dev/null 2>&1 || true
-    ssh "$HOST" "cd zurich && docker compose down" >/dev/null 2>&1
+    ssh "$HOST" "cd $REMOTE_DIR && docker compose down" >/dev/null 2>&1
     echo "Torque OFF. Put the robot in the ZERO pose: body upright, both legs straight, vertical and"
     echo "parallel, feet flat on the floor and level with each other. Hold it still."
     read -rp "Press Enter to store this pose as zero... "
-    ssh "$HOST" "cd zurich && \
+    ssh "$HOST" "cd $REMOTE_DIR && \
       docker compose run --rm robot ros2 run biped_control st3215_tool --port /dev/ttyAMA0 set-middle 1 2 3 && \
       docker compose run --rm robot ros2 run biped_control st3215_tool --port /dev/ttyAMA2 set-middle 4 5 6" \
       2>&1 | grep -v Container
     echo "Done (stored in the servos). Next: scripts/robot.sh start" ;;
   start-rl)
-    ssh "$HOST" "cd zurich && docker compose down >/dev/null 2>&1; \
+    ssh "$HOST" "cd $REMOTE_DIR && docker compose down >/dev/null 2>&1; \
       ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-42} LAUNCH_ARGS='policy:=${2:-plates_v1} ${*:3}' docker compose up -d"
     echo "RL policy loaded, robot stands up. Then: scripts/robot.sh rl-on | rl-off" ;;
   rl-on)  ros ros2 param set /rl_policy enabled true ;;
   rl-off) ros ros2 param set /rl_policy enabled false ;;
   start-ro)
-    ssh "$HOST" "cd zurich && docker compose down >/dev/null 2>&1; \
+    ssh "$HOST" "cd $REMOTE_DIR && docker compose down >/dev/null 2>&1; \
       ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-42} LAUNCH_ARGS='read_only:=true' docker compose up -d" ;;
   walk)   ros ros2 param set /gait walk true ;;
   stop)   ros ros2 param set /gait walk false ;;
-  estop)  ros ros2 service call /gait/estop std_srvs/srv/Trigger ;;
+  estop)  # whichever controller runs: gait_node (/gait/estop) or rl_policy_node (/rl/estop)
+    ros "timeout 3 ros2 service call /gait/estop std_srvs/srv/Trigger & timeout 3 ros2 service call /rl/estop std_srvs/srv/Trigger & wait" ;;
   resume) ros ros2 service call /gait/resume std_srvs/srv/Trigger ;;
   set)    ros "ros2 param set /gait $2 '$3'" ;;   # quoted: arrays like trim '[0,0,-0.03,0,0,-0.03]' work
   lean-fwd|lean-back)   # adjust both ankle trims; negative ankle = lean forward
@@ -129,7 +131,7 @@ PY" ;;
     "$0" stop >/dev/null; sleep 2
     "$0" record-stop ;;
   status)
-    ssh "$HOST" "cd zurich && docker compose logs --since 30s 2>&1 | grep -E 'NOT ANSWERING|NO IMU DATA|I2C read failed' | tail -3 | sed 's/.*]: /!! /'" || true
+    ssh "$HOST" "cd $REMOTE_DIR && docker compose logs --since 30s 2>&1 | grep -E 'NOT ANSWERING|NO IMU DATA|I2C read failed' | tail -3 | sed 's/.*]: /!! /'" || true
     ros "ros2 control list_hardware_components | grep -E 'name|state'
          ros2 control list_controllers
          python3 - <<'PY'
@@ -153,11 +155,11 @@ if 'js' in d:
 else:
     print('joints  no data on joint_states')
 PY" ;;
-  logs)   ssh "$HOST" "cd zurich && docker compose logs -f --tail 50" ;;
+  logs)   ssh "$HOST" "cd $REMOTE_DIR && docker compose logs -f --tail 50" ;;
   rviz)   exec scripts/rviz_robot.sh "$HOST" ;;
   down)   # torque off first (stopping the container alone may leave the servos holding)
     ros "timeout 5 ros2 service call /gait/estop std_srvs/srv/Trigger >/dev/null 2>&1; sleep 0.3
          ros2 control set_hardware_component_state BipedSystem inactive" 2>/dev/null || true
-    ssh "$HOST" "cd zurich && docker compose down" ;;
+    ssh "$HOST" "cd $REMOTE_DIR && docker compose down" ;;
   *)      usage; exit 1 ;;
 esac

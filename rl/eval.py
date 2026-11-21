@@ -4,6 +4,7 @@
   .venv-rl/bin/python rl/eval.py round_v1 --viewer        # watch it (run outside the snap VS Code
                                                           # terminal or use scripts/sim.sh env fix)
   .venv-rl/bin/python rl/eval.py round_v1 --check         # numpy vs torch output match
+  .venv-rl/bin/python rl/eval.py ws/src/biped_control/policies/plates_v1.npz --viewer   # shipped policy
 """
 import argparse
 import os
@@ -43,8 +44,11 @@ def main():
     ap.add_argument('--flat', action='store_true')
     ap.add_argument('--wz', type=float, default=0.0, help='yaw rate command for --viewer')
     a = ap.parse_args()
-    run = os.path.join(HERE, 'runs', a.run)
-    policy = NumpyPolicy(os.path.join(run, 'policy.npz'))
+    if a.run.endswith('.npz'):  # a policy file, e.g. ws/src/biped_control/policies/plates_v1.npz
+        run, policy = os.path.dirname(os.path.abspath(a.run)), NumpyPolicy(a.run)
+    else:
+        run = os.path.join(HERE, 'runs', a.run)
+        policy = NumpyPolicy(os.path.join(run, 'policy.npz'))
     sole = policy.sole or ([0.04, 0.045, 0.004] if a.flat else None)
     cut = policy.cut if policy.cut is not None else 0.0
     kw = dict(sole=sole, cut=cut, ref=policy.ref, action_scale=policy.action_scale)

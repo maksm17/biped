@@ -2,10 +2,10 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
 <name>biped_description</name>
-  <version>0.0.0</version>
-<description>The biped_description package</description>
-  <maintainer email="todo@todo.com">author</maintainer>
-  <license>TODO: License declaration</license>
+  <version>0.1.0</version>
+<description>URDF/xacro, meshes and ros2_control config of the 6-DOF biped</description>
+  <maintainer email="maksmajdanski@gmail.com">maks</maintainer>
+  <license>MIT</license>
 
   <depend>xacro</depend>
   <depend>rviz2</depend>
@@ -13,9 +13,6 @@
   <depend>joint_state_publisher</depend>
   <depend>joint_state_publisher_gui</depend>
 
-  <test_depend>ament_lint_auto</test_depend>
-  <test_depend>ament_lint_common</test_depend>
-  <test_depend>python3-pytest</test_depend>
 
   <export>
     <build_type>ament_python</build_type>
