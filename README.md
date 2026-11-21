@@ -6,7 +6,7 @@ MuJoCo and deployed on the real robot: six ST3215 serial bus servos, a Raspberry
 <table>
   <tr>
     <td align="center"><img src="docs/robot.jpg" alt="The real robot" width="400"><br><sub>The real robot</sub></td>
-    <td align="center"><img src="docs/mujoco.png" alt="The robot in MuJoCo" width="400"><br><sub>The same robot in MuJoCo</sub></td>
+    <td align="center"><img src="docs/mujoco.jpg" alt="The robot in MuJoCo" width="400"><br><sub>The same robot in MuJoCo</sub></td>
   </tr>
 </table>
 
