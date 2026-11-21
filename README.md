@@ -35,8 +35,6 @@ joint targets = sine_gait(φ, command) + 0.15 rad × policy(observation)        
 - `st3215_hardware` is the `ros2_control` driver: one sync read and one sync write per cycle on each leg's bus.
 - Both controllers go limp on a fall (tilt > 40°) or an e-stop: the servo targets follow the measured pose.
 
-
-
 ## Layout
 
 ```
